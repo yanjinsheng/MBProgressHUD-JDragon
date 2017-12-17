@@ -122,7 +122,7 @@ Pod::Spec.new do |s|
 
   # s.library   = "iconv"
   # s.libraries = "iconv", "xml2"
-  s.dependency  'MBProgressHUD', '~> 0.9.2'
+  s.dependency  'MBProgressHUD'
 
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
