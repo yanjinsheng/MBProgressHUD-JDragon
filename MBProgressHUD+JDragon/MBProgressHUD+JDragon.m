@@ -14,8 +14,8 @@
 {
     UIView  *view = isWindow? (UIView*)[UIApplication sharedApplication].delegate.window:[self getCurrentUIVC].view;
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
-    hud.labelText=message?message:@"加载中.....";
-    hud.labelFont=[UIFont systemFontOfSize:15];
+    hud.detailsLabelText=message?message:@"加载中.....";
+    hud.detailsLabelFont=[UIFont systemFontOfSize:15];
     hud.removeFromSuperViewOnHide = YES;
     hud.dimBackground = NO;
     return hud;
@@ -40,9 +40,11 @@
 }
 + (void)showTipMessage:(NSString*)message isWindow:(BOOL)isWindow timer:(int)aTimer
 {
-    MBProgressHUD *hud = [self createMBProgressHUDviewWithMessage:message isWindiw:isWindow];
-    hud.mode = MBProgressHUDModeText;
-    [hud hide:YES afterDelay:1];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MBProgressHUD *hud = [self createMBProgressHUDviewWithMessage:message isWindiw:isWindow];
+        hud.mode = MBProgressHUDModeText;
+        [hud hide:YES afterDelay:1];
+    });
 }
 #pragma mark-------------------- show Activity----------------------------
 
@@ -64,11 +66,13 @@
 }
 + (void)showActivityMessage:(NSString*)message isWindow:(BOOL)isWindow timer:(int)aTimer
 {
-    MBProgressHUD *hud  =  [self createMBProgressHUDviewWithMessage:message isWindiw:isWindow];
-    hud.mode = MBProgressHUDModeIndeterminate;
-    if (aTimer>0) {
-        [hud hide:YES afterDelay:aTimer];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MBProgressHUD *hud  =  [self createMBProgressHUDviewWithMessage:message isWindiw:isWindow];
+        hud.mode = MBProgressHUDModeIndeterminate;
+        if (aTimer>0) {
+            [hud hide:YES afterDelay:aTimer];
+        }
+    });
 }
 #pragma mark-------------------- show Image----------------------------
 
@@ -103,17 +107,20 @@
 }
 + (void)showCustomIcon:(NSString *)iconName message:(NSString *)message isWindow:(BOOL)isWindow
 {
-    MBProgressHUD *hud  =  [self createMBProgressHUDviewWithMessage:message isWindiw:isWindow];
-    hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:iconName]];
-    hud.mode = MBProgressHUDModeCustomView;
-    [hud hide:YES afterDelay:1];
-    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MBProgressHUD *hud  =  [self createMBProgressHUDviewWithMessage:message isWindiw:isWindow];
+        hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:iconName]];
+        hud.mode = MBProgressHUDModeCustomView;
+        [hud hide:YES afterDelay:1];
+    });
 }
 + (void)hideHUD
 {
-    UIView  *winView =(UIView*)[UIApplication sharedApplication].delegate.window;
-    [self hideAllHUDsForView:winView animated:YES];
-    [self hideAllHUDsForView:[self getCurrentUIVC].view animated:YES];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIView  *winView =(UIView*)[UIApplication sharedApplication].delegate.window;
+        [self hideAllHUDsForView:winView animated:YES];
+        [self hideAllHUDsForView:[self getCurrentUIVC].view animated:YES];
+    });
 }
 //获取当前屏幕显示的viewcontroller
 +(UIViewController *)getCurrentWindowVC
@@ -158,11 +165,12 @@
         }
         return tabSelectVC;
     }else
-    if ([superVC isKindOfClass:[UINavigationController class]]) {
-        
-        return ((UINavigationController*)superVC).viewControllers.lastObject;  
-    }
+        if ([superVC isKindOfClass:[UINavigationController class]]) {
+            
+            return ((UINavigationController*)superVC).viewControllers.lastObject;
+        }
     return superVC;
 }
 
 @end
+
